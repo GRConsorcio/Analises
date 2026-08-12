@@ -39,12 +39,15 @@ body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-h
 .auth-header h1{font-family:"Cinzel",serif;font-size:1.25rem;font-weight:600;color:var(--gold2);letter-spacing:0.08em;}
 .auth-header p{font-size:0.72rem;color:var(--muted2);margin-top:4px;letter-spacing:0.1em;}
 .auth-body{padding:1.8rem 2rem 2rem;}
+.auth-tabs{display:flex;gap:0;margin-bottom:1.3rem;background:var(--surface2);border-radius:var(--radius);padding:3px;}
+.auth-tab{flex:1;padding:0.5rem;font-family:"Inter",sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--muted2);border-radius:6px;transition:all 0.15s;}
+.auth-tab.active{background:var(--gold);color:#fff;}
 .fg{margin-bottom:0.95rem;}
 .fg label{display:block;font-size:0.7rem;color:var(--muted2);margin-bottom:5px;letter-spacing:0.05em;text-transform:uppercase;}
 .fg input,.fg select{width:100%;padding:0.65rem 1rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:"Inter",sans-serif;font-size:0.87rem;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
 .fg input:focus,.fg select:focus{border-color:var(--gold3);}
 .fg select option{background:var(--surface2);}
-.btn-gold{width:100%;padding:0.75rem;background:var(--gold);border:none;border-radius:var(--radius);color:#0a0a0a;font-family:"Inter",sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-gold{width:100%;padding:0.75rem;background:var(--gold);border:none;border-radius:var(--radius);color:#fff;font-family:"Inter",sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
 .btn-gold:hover{background:var(--gold2);}
 .auth-err{color:var(--red);font-size:0.79rem;margin-top:0.7rem;text-align:center;min-height:1.1rem;}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
@@ -61,11 +64,11 @@ body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-h
 .nav-item:hover{color:var(--text);background:var(--gold-glow2);}
 .nav-item.active{color:var(--gold2);background:var(--gold-glow);border-left-color:var(--gold);}
 .nav-icon{width:15px;height:15px;flex-shrink:0;}
-.nav-badge{margin-left:auto;background:var(--gold);color:#0a0a0a;font-size:0.63rem;font-weight:700;padding:1px 6px;border-radius:20px;}
+.nav-badge{margin-left:auto;background:var(--gold);color:#fff;font-size:0.63rem;font-weight:700;padding:1px 6px;border-radius:20px;}
 .sb-user{margin-top:auto;border-top:1px solid var(--border);padding:0.9rem;}
 .ucard{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0.85rem;}
 .ucard-top{display:flex;align-items:center;gap:9px;margin-bottom:0.75rem;}
-.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:0.78rem;font-weight:700;color:#0a0a0a;flex-shrink:0;border:1px solid var(--border2);}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:0.78rem;font-weight:700;color:#fff;flex-shrink:0;border:1px solid var(--border2);}
 .u-name{font-size:0.83rem;font-weight:600;color:var(--text);line-height:1.2;}
 .u-dept{font-size:0.7rem;color:var(--muted2);}
 .u-rows{margin-bottom:0.75rem;}
@@ -82,9 +85,9 @@ body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-h
 .tb-title{font-size:0.98rem;font-weight:600;color:var(--text);white-space:nowrap;}
 .tb-sub{font-size:0.72rem;color:var(--muted);}
 .topbar-r{display:flex;align-items:center;gap:0.6rem;flex-shrink:0;}
-.btn-new{display:flex;align-items:center;gap:6px;padding:0.48rem 1rem;background:var(--gold);border:none;border-radius:var(--radius);color:#0a0a0a;font-family:"Inter",sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-new{display:flex;align-items:center;gap:6px;padding:0.48rem 1rem;background:var(--gold);border:none;border-radius:var(--radius);color:#fff;font-family:"Inter",sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
 .btn-new:hover{background:var(--gold2);}
-.tb-avatar{width:33px;height:33px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:0.72rem;font-weight:700;color:#0a0a0a;border:1px solid var(--border2);cursor:pointer;flex-shrink:0;}
+.tb-avatar{width:33px;height:33px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:0.72rem;font-weight:700;color:#fff;border:1px solid var(--border2);cursor:pointer;flex-shrink:0;}
 .content{padding:1.1rem 1.4rem;flex:1;}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1.1rem;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:0.95rem 1rem;position:relative;overflow:hidden;}
@@ -167,7 +170,7 @@ body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-h
 .u-critico input:checked+label{border-color:#f87171;background:rgba(248,113,113,0.08);color:#f87171;}
 .btn-cancel{padding:0.52rem 1.1rem;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted2);font-family:"Inter",sans-serif;font-size:0.83rem;cursor:pointer;transition:all 0.2s;}
 .btn-cancel:hover{border-color:var(--border2);color:var(--text);}
-.btn-submit{padding:0.52rem 1.2rem;background:var(--gold);border:none;border-radius:var(--radius);color:#0a0a0a;font-family:"Inter",sans-serif;font-size:0.83rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-submit{padding:0.52rem 1.2rem;background:var(--gold);border:none;border-radius:var(--radius);color:#fff;font-family:"Inter",sans-serif;font-size:0.83rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
 .btn-submit:hover{background:var(--gold2);}
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.85rem;}
 .di-label{font-size:0.65rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;}
@@ -192,7 +195,7 @@ body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-h
 
 .pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:0.9rem;}
 .pcard-head{background:linear-gradient(160deg,#111 0%,#1a1500 100%);padding:1.8rem;text-align:center;border-bottom:1px solid var(--border);}
-.p-av{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:1.3rem;font-weight:700;color:#0a0a0a;margin:0 auto 0.8rem;border:2px solid var(--border2);}
+.p-av{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:1.3rem;font-weight:700;color:#fff;margin:0 auto 0.8rem;border:2px solid var(--border2);}
 .p-name{font-size:1.05rem;font-weight:600;color:var(--gold2);}
 .p-sub{font-size:0.76rem;color:var(--muted2);margin-top:3px;}
 .pcard-body{padding:1.1rem;}
@@ -251,7 +254,7 @@ body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-h
 .reply-bubble{display:flex;gap:0.6rem;animation:replyIn 0.2s ease;}
 @keyframes replyIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .reply-bubble.mine{flex-direction:row-reverse;}
-.reply-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:0.6rem;font-weight:700;color:#0a0a0a;flex-shrink:0;border:1px solid var(--border2);align-self:flex-start;margin-top:2px;}
+.reply-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:0.6rem;font-weight:700;color:#fff;flex-shrink:0;border:1px solid var(--border2);align-self:flex-start;margin-top:2px;}
 .reply-av.other{background:linear-gradient(135deg,#2a2a3a,#3a3a4a);color:var(--muted2);}
 .reply-body{max-width:82%;display:flex;flex-direction:column;gap:3px;}
 .reply-bubble.mine .reply-body{align-items:flex-end;}
@@ -268,7 +271,7 @@ body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-h
 .reply-del{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:0.72rem;padding:0 3px;transition:color 0.15s;align-self:center;}
 .reply-del:hover{color:var(--red);}
 .reply-input-wrap{display:flex;gap:0.5rem;align-items:flex-end;}
-.reply-input-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:0.6rem;font-weight:700;color:#0a0a0a;flex-shrink:0;border:1px solid var(--border2);}
+.reply-input-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold));display:grid;place-items:center;font-size:0.6rem;font-weight:700;color:#fff;flex-shrink:0;border:1px solid var(--border2);}
 .reply-input-box{flex:1;position:relative;}
 .reply-input-box textarea{width:100%;padding:0.55rem 2.8rem 0.55rem 0.85rem;background:var(--surface2);border:1px solid var(--border);border-radius:20px;color:var(--text);font-family:"Inter",sans-serif;font-size:0.84rem;outline:none;resize:none;line-height:1.4;min-height:40px;max-height:120px;overflow-y:auto;transition:border-color 0.2s;}
 .reply-input-box textarea:focus{border-color:var(--gold3);}
@@ -328,6 +331,10 @@ body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-h
       <p>ANÁLISES</p>
     </div>
     <div class="auth-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="auth-tab-login" onclick="switchAuthTab('login')">Entrar</button>
+        <button class="auth-tab" id="auth-tab-register" onclick="switchAuthTab('register')">Cadastrar</button>
+      </div>
       <div id="tab-login">
         <div class="fg"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email"/></div>
         <div class="fg"><label>Senha</label><input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/></div>
@@ -336,6 +343,14 @@ body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-h
           <span>Lembrar minha senha</span>
         </label>
         <button class="btn-gold" onclick="doLogin()">Entrar</button>
+      </div>
+      <div id="tab-register" style="display:none">
+        <div class="fg"><label>Nome completo</label><input type="text" id="reg-name" placeholder="Seu nome"/></div>
+        <div class="fg"><label>E-mail</label><input type="email" id="reg-email" placeholder="seu@email.com" autocomplete="email"/></div>
+        <div class="fg"><label>Senha</label><input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/></div>
+        <div class="fg"><label>Confirmar senha</label><input type="password" id="reg-password2" placeholder="Repita a senha" autocomplete="new-password"/></div>
+        <p style="font-size:0.72rem;color:var(--muted2);margin:-0.3rem 0 1rem;line-height:1.5">A conta é criada junto com o CRM (mesmo login). Depois de cadastrar, um admin precisa liberar o acesso antes de você conseguir entrar.</p>
+        <button class="btn-gold" onclick="doRegister()">Criar conta</button>
       </div>
       <div class="auth-err" id="auth-error"></div>
     </div>
@@ -752,6 +767,57 @@ window.doLogin=async()=>{
   }
 };
 window.doLogout=async()=>{localStorage.removeItem("gr_analises_creds");await sb.auth.signOut();};
+
+window.switchAuthTab=(tab)=>{
+  document.getElementById("tab-login").style.display=tab==="login"?"block":"none";
+  document.getElementById("tab-register").style.display=tab==="register"?"block":"none";
+  document.getElementById("auth-tab-login").classList.toggle("active",tab==="login");
+  document.getElementById("auth-tab-register").classList.toggle("active",tab==="register");
+  const err=document.getElementById("auth-error");
+  err.textContent="";err.style.color="";
+};
+
+// Cadastro cria conta na MESMA base do CRM (crm_users) — a conta nasce
+// desativada (ativo:false); um admin precisa ativá-la em crm_users antes
+// do usuário conseguir entrar aqui (ou no CRM).
+window.doRegister=async()=>{
+  const name=document.getElementById("reg-name").value.trim();
+  const email=document.getElementById("reg-email").value.trim();
+  const pass=document.getElementById("reg-password").value;
+  const pass2=document.getElementById("reg-password2").value;
+  const err=document.getElementById("auth-error");
+  err.style.color="";err.textContent="";
+  if(!name||!email||!pass){err.textContent="Preencha nome, e-mail e senha.";return;}
+  if(pass.length<6){err.textContent="Senha mínima 6 caracteres.";return;}
+  if(pass!==pass2){err.textContent="As senhas não coincidem.";return;}
+  document.getElementById("login-loading").classList.add("show");
+  try{
+    const {data,error}=await sb.auth.signUp({email,password:pass});
+    if(error)throw error;
+    const newUser=data.user;
+    if(newUser){
+      const {error:insErr}=await sb.from("crm_users").insert({user_id:newUser.id,name,email,role:"vendedor",ativo:false});
+      if(insErr)console.error("crm_users insert error:",insErr);
+    }
+    // Sempre desloga depois do cadastro — a conta só deve funcionar depois
+    // que um admin marcar ativo:true, e não queremos depender do timing
+    // do listener de auth pra garantir isso.
+    await sb.auth.signOut();
+    document.getElementById("login-loading").classList.remove("show");
+    switchAuthTab("login");
+    document.getElementById("login-email").value=email;
+    err.style.color="var(--green)";
+    err.textContent="Conta criada! Aguarde um admin liberar seu acesso antes de entrar.";
+  }catch(e){
+    document.getElementById("login-loading").classList.remove("show");
+    const msg=(e.message||"").toLowerCase();
+    let m="Erro ao criar conta.";
+    if(msg.includes("already registered")||msg.includes("already exists")||msg.includes("user already"))m="Esse e-mail já tem conta.";
+    else if(msg.includes("password"))m="Senha inválida (mínimo 6 caracteres).";
+    else if(msg.includes("email"))m="E-mail inválido.";
+    err.textContent=m;
+  }
+};
 
 async function handleSession(session){
   document.getElementById("login-loading").classList.remove("show");
@@ -1392,6 +1458,7 @@ function showReplyNotification(reply,ticketId){
 document.querySelectorAll(".moverlay").forEach(el=>el.addEventListener("click",e=>{if(e.target===el)el.classList.remove("open");}));
 document.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&document.getElementById("tab-login").style.display!=="none")doLogin();
+  else if(e.key==="Enter"&&document.getElementById("tab-register").style.display!=="none")doRegister();
   if(e.key==="Escape")document.querySelectorAll(".moverlay.open").forEach(m=>m.classList.remove("open"));
 });
 </script>
