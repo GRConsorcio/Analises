@@ -169,6 +169,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .badge-fechado{background:rgba(139,143,163,0.14);color:#8b8fa3;}
 .badge-aguardando{background:rgba(251,191,36,0.14);color:#fbbf24;}
 .badge-pendente{background:rgba(251,191,36,0.14);color:#fbbf24;}
+.badge-feita{background:rgba(96,165,250,0.14);color:#60a5fa;}
 .badge-aprovada{background:rgba(74,222,128,0.14);color:#4ade80;}
 .badge-reprovada{background:rgba(239,68,68,0.14);color:#ef4444;}
 .btn-view{padding:0.32rem 0.85rem;background:transparent;border:1px solid var(--border);border-radius:var(--radius-pill);color:var(--muted2);font-family:"Inter",sans-serif;font-size:0.73rem;font-weight:600;cursor:pointer;transition:all .16s var(--ease);white-space:nowrap;}
@@ -684,6 +685,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         <div style="font-size:0.65rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:7px">Alterar status</div>
         <div class="srow">
           <button class="sbtn" data-status="pendente" onclick="changeStatus('pendente')">Pendente</button>
+          <button class="sbtn" data-status="feita" onclick="changeStatus('feita')">📋 Análise Feita</button>
           <button class="sbtn" data-status="aprovada" onclick="changeStatus('aprovada')">✅ Análise Aprovada</button>
           <button class="sbtn" data-status="reprovada" onclick="changeStatus('reprovada')">❌ Análise Reprovada</button>
         </div>
@@ -794,7 +796,7 @@ const CLD_URL=`https://api.cloudinary.com/v1_1/${CLD.cloud}/auto/upload`;
 // crm_users do mesmo projeto Supabase do CRM. "Admin" aqui = role admin/ceo.
 const ROLE_LABEL={admin:"Admin",ceo:"CEO",coordenador:"Coordenador",supervisor:"Supervisor",vendedor:"Vendedor"};
 const isAdmin=role=>role==="admin"||role==="ceo";
-const STATUS_LABEL={pendente:"Pendente",aprovada:"Análise Aprovada",reprovada:"Análise Reprovada"};
+const STATUS_LABEL={pendente:"Pendente",feita:"Análise Feita",aprovada:"Análise Aprovada",reprovada:"Análise Reprovada"};
 
 // Antes existia um modo "particular" que escondia a análise de todo mundo
 // menos quem abriu e o admin. O formulário de criação não oferece mais essa
@@ -1139,14 +1141,15 @@ function refreshModalData(t){
 
 window.changeStatus=async status=>{
   if(!vTicketId)return;
-  const patch={status,updated_at:new Date().toISOString(),resolved_at:status!=="pendente"?new Date().toISOString():null};
+  const isFinal=status==="aprovada"||status==="reprovada";
+  const patch={status,updated_at:new Date().toISOString(),resolved_at:isFinal?new Date().toISOString():null};
   try{
     const {error}=await sb.from("analises").update(patch).eq("id",vTicketId);
     if(error)throw error;
     const t=tickets.find(x=>x.id===vTicketId);
     if(t){Object.assign(t,patch);refreshModalData(t);}
     updateStats();updateBadges();renderTickets();
-    showToast(status==="aprovada"?"✅ Análise aprovada!":status==="reprovada"?"❌ Análise reprovada.":"Status atualizado!");
+    showToast(status==="aprovada"?"✅ Análise aprovada!":status==="reprovada"?"❌ Análise reprovada.":status==="feita"?"📋 Análise marcada como feita.":"Status atualizado!");
   }catch(e){console.error(e);showToast("Erro ao atualizar.",false);}
 };
 
