@@ -213,6 +213,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .u-medio input:checked+label{border-color:#fbbf24;background:rgba(251,191,36,0.1);color:#fbbf24;}
 .u-alto input:checked+label{border-color:#fb923c;background:rgba(251,146,60,0.1);color:#fb923c;}
 .u-critico input:checked+label{border-color:#f87171;background:rgba(248,113,113,0.1);color:#f87171;}
+.pill-grid{display:flex;gap:0.5rem;padding-top:2px;}
+.po input{display:none;}
+.po label{display:flex;align-items:center;padding:0.5rem 1rem;border:1px solid var(--border);border-radius:var(--radius-pill);cursor:pointer;transition:all .16s var(--ease);font-size:0.8rem;font-weight:600;color:var(--muted2);}
+.po label:hover{border-color:var(--border2);}
+.po input:checked+label{border-color:var(--gold2);background:var(--gold-glow);color:var(--gold2);}
 .btn-cancel{padding:0.56rem 1.15rem;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted2);font-family:"Inter",sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer;transition:all .16s var(--ease);}
 .btn-cancel:hover{border-color:var(--border2);color:var(--text);background:var(--surface2);}
 .btn-submit{padding:0.56rem 1.25rem;background:var(--gold);border:none;border-radius:var(--radius);color:#fff;font-family:"Inter",sans-serif;font-size:0.83rem;font-weight:700;cursor:pointer;transition:all .16s var(--ease);box-shadow:var(--shadow-sm);}
@@ -555,10 +560,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         <div class="fg2"><label>CPF *</label><input type="text" id="new-cpf" placeholder="000.000.000-00"/></div>
       </div>
       <div class="frow2c">
-        <div class="fg2"><label>Crédito</label><input type="text" id="new-credito" placeholder="Valor do crédito pretendido"/></div>
-        <div class="fg2"><label>Valor de parcela</label><input type="text" id="new-parcela" placeholder="Valor da parcela"/></div>
-      </div>
-      <div class="frow2c">
         <div class="fg2"><label>Renda</label><input type="text" id="new-renda" placeholder="Renda mensal"/></div>
         <div class="fg2"><label>Profissão</label><input type="text" id="new-profissao" placeholder="Profissão"/></div>
       </div>
@@ -579,16 +580,16 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         <div class="frow2c">
           <div class="fg2">
             <label>Bem</label>
-            <div style="display:flex;gap:14px;padding-top:4px">
-              <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer"><input type="radio" name="bem" id="bem-imovel" value="imovel" checked/> Imóvel</label>
-              <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer"><input type="radio" name="bem" id="bem-auto" value="auto"/> Auto</label>
+            <div class="pill-grid">
+              <div class="po"><input type="radio" name="bem" id="bem-imovel" value="imovel" checked/><label for="bem-imovel">Imóvel</label></div>
+              <div class="po"><input type="radio" name="bem" id="bem-auto" value="auto"/><label for="bem-auto">Auto</label></div>
             </div>
           </div>
           <div class="fg2">
             <label>Administradora</label>
-            <div style="display:flex;gap:14px;padding-top:4px">
-              <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer"><input type="radio" name="administradora" id="adm-roma" value="roma" checked/> Roma</label>
-              <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer"><input type="radio" name="administradora" id="adm-santander" value="santander"/> Santander</label>
+            <div class="pill-grid">
+              <div class="po"><input type="radio" name="administradora" id="adm-roma" value="roma" checked/><label for="adm-roma">Roma</label></div>
+              <div class="po"><input type="radio" name="administradora" id="adm-santander" value="santander"/><label for="adm-santander">Santander</label></div>
             </div>
           </div>
         </div>
@@ -602,12 +603,6 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
           <div class="uo u-alto"><input type="radio" name="urg" id="u-a" value="alto"/><label for="u-a"><div class="udot"></div>Alto</label></div>
           <div class="uo u-critico"><input type="radio" name="urg" id="u-c" value="critico"/><label for="u-c"><div class="udot"></div>Crítico</label></div>
         </div>
-      </div>
-      <div class="fg2"><label>Descrição detalhada</label><textarea id="new-desc" placeholder="Descreva o problema, erros, quando começou..."></textarea></div>
-      <div class="fg2"><label>Informações adicionais</label><textarea id="new-extra" placeholder="Patrimônio, versão do sistema, usuário afetado..." style="min-height:65px"></textarea></div>
-      <div class="fg2" style="display:flex;align-items:center;gap:8px;margin-top:4px">
-        <input type="checkbox" id="new-private" style="width:16px;height:16px;accent-color:var(--gold);cursor:pointer"/>
-        <label for="new-private" style="margin:0;cursor:pointer;user-select:none">🔒 Análise particular — só eu e o admin conseguimos ver</label>
       </div>
     </div>
     <div class="mfoot">
@@ -662,14 +657,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
           <div><div class="di-label">Idade</div><div class="di-val" id="vd-idade">–</div></div>
           <div><div class="di-label">Telefone</div><div class="di-val" id="vd-telefone">–</div></div>
           <div><div class="di-label">CPF</div><div class="di-val" id="vd-cpf">–</div></div>
-          <div><div class="di-label">Crédito</div><div class="di-val" id="vd-credito">–</div></div>
-          <div><div class="di-label">Valor de parcela</div><div class="di-val" id="vd-parcela">–</div></div>
           <div><div class="di-label">Renda</div><div class="di-val" id="vd-renda">–</div></div>
           <div><div class="di-label">Profissão</div><div class="di-val" id="vd-profissao">–</div></div>
           <div><div class="di-label">Endereço</div><div class="di-val" id="vd-endereco">–</div></div>
           <div><div class="di-label">CEP</div><div class="di-val" id="vd-cep">–</div></div>
-          <div><div class="di-label">Crédito (sistema)</div><div class="di-val" id="vd-credito-sistema">–</div></div>
-          <div><div class="di-label">Parcela (sistema)</div><div class="di-val" id="vd-parcela-sistema">–</div></div>
+          <div><div class="di-label">Crédito</div><div class="di-val" id="vd-credito-sistema">–</div></div>
+          <div><div class="di-label">Parcela</div><div class="di-val" id="vd-parcela-sistema">–</div></div>
           <div><div class="di-label">Meses</div><div class="di-val" id="vd-meses">–</div></div>
           <div><div class="di-label">Grupo</div><div class="di-val" id="vd-grupo">–</div></div>
           <div><div class="di-label">Bem</div><div class="di-val" id="vd-bem">–</div></div>
@@ -1048,8 +1041,6 @@ window.submitTicket=async()=>{
   const idadeRaw=document.getElementById("new-idade").value;
   const telefone=document.getElementById("new-telefone").value.trim();
   const cpf=document.getElementById("new-cpf").value.trim();
-  const credito=document.getElementById("new-credito").value.trim();
-  const parcela=document.getElementById("new-parcela").value.trim();
   const creditoSistema=document.getElementById("new-credito-sistema").value.trim();
   const parcelaSistema=document.getElementById("new-parcela-sistema").value.trim();
   const meses=document.getElementById("new-meses").value.trim();
@@ -1062,25 +1053,21 @@ window.submitTicket=async()=>{
   const cep=document.getElementById("new-cep").value.trim();
   const title=document.getElementById("new-title").value.trim();
   const urgency=document.querySelector("input[name='urg']:checked")?.value||"baixo";
-  const desc=document.getElementById("new-desc").value.trim();
-  const extra=document.getElementById("new-extra").value.trim();
-  const isPrivate=document.getElementById("new-private").checked;
   if(!nome||!telefone||!cpf||!title){showToast("Preencha os campos obrigatórios.",false);return;}
   try{
     const {error}=await sb.from("analises").insert({
-      ticket_id:gid(),nome,idade:idadeRaw?parseInt(idadeRaw,10):null,telefone,cpf,credito,parcela,renda,profissao,endereco,cep,
+      ticket_id:gid(),nome,idade:idadeRaw?parseInt(idadeRaw,10):null,telefone,cpf,renda,profissao,endereco,cep,
       credito_sistema:creditoSistema,parcela_sistema:parcelaSistema,meses,grupo,bem,administradora,
-      title,urgency,description:desc,extra,is_private:isPrivate,
+      title,urgency,is_private:false,
       status:"pendente",user_id:cu.id,user_name:cp?.name||cu.email,user_dept:ROLE_LABEL[cp?.role]||cp?.role||"–",
       attachments:[]
     });
     if(error)throw error;
-    closeModal("modal-new");showToast(isPrivate?"Análise particular solicitada — só você e o admin veem.":"Análise solicitada com sucesso!");
-    ["new-nome","new-idade","new-telefone","new-cpf","new-credito","new-parcela","new-credito-sistema","new-parcela-sistema","new-meses","new-grupo","new-renda","new-profissao","new-endereco","new-cep","new-title","new-desc","new-extra"].forEach(i=>document.getElementById(i).value="");
+    closeModal("modal-new");showToast("Análise solicitada com sucesso!");
+    ["new-nome","new-idade","new-telefone","new-cpf","new-credito-sistema","new-parcela-sistema","new-meses","new-grupo","new-renda","new-profissao","new-endereco","new-cep","new-title"].forEach(i=>document.getElementById(i).value="");
     document.getElementById("u-b").checked=true;
     document.getElementById("bem-imovel").checked=true;
     document.getElementById("adm-roma").checked=true;
-    document.getElementById("new-private").checked=false;
   }catch(e){console.error(e);showToast("Erro ao solicitar análise.",false);}
 };
 
@@ -1096,8 +1083,6 @@ window.viewTicket=id=>{
   document.getElementById("vd-idade").textContent=(t.idade??"–");
   document.getElementById("vd-telefone").textContent=t.telefone||"–";
   document.getElementById("vd-cpf").textContent=t.cpf||"–";
-  document.getElementById("vd-credito").textContent=t.credito||"–";
-  document.getElementById("vd-parcela").textContent=t.parcela||"–";
   document.getElementById("vd-renda").textContent=t.renda||"–";
   document.getElementById("vd-profissao").textContent=t.profissao||"–";
   document.getElementById("vd-credito-sistema").textContent=t.credito_sistema||"–";
