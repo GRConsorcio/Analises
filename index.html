@@ -286,6 +286,15 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .attach-dl:hover{border-color:var(--gold2);color:var(--gold2);}
 .attach-del{padding:0.2rem 0.45rem;background:transparent;border:1px solid transparent;border-radius:6px;color:var(--muted);font-size:0.82rem;cursor:pointer;transition:all .15s;line-height:1;}
 .attach-del:hover{color:var(--red);border-color:rgba(248,113,113,0.3);}
+.attach-view-toggle{display:flex;gap:4px;}
+.attach-view-toggle button{background:var(--surface2);border:1px solid var(--border);color:var(--muted2);border-radius:6px;padding:4px 10px;font-size:0.7rem;cursor:pointer;font-weight:700;font-family:"Inter",sans-serif;}
+.attach-view-toggle button.on{color:var(--gold2);border-color:var(--gold-dim);background:var(--gold-glow);}
+.attach-feed-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:0.65rem;margin-bottom:0.6rem;}
+.attach-feed-head{display:flex;align-items:center;gap:0.65rem;margin-bottom:0.55rem;}
+.attach-preview-body{border-radius:8px;overflow:hidden;background:var(--bg);min-height:60px;display:flex;align-items:center;justify-content:center;}
+.attach-preview-body img{width:100%;display:block;max-height:600px;object-fit:contain;background:#111;}
+.attach-preview-body iframe{width:100%;height:600px;border:none;display:block;}
+.attach-preview-empty{padding:20px;font-size:0.72rem;color:var(--muted2);text-align:center;width:100%;}
 .upload-progress{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:0.65rem 0.9rem;margin-bottom:0.5rem;display:none;}
 .upload-progress-bar{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden;}
 .upload-progress-fill{height:100%;background:var(--gold2);border-radius:2px;transition:width .2s;width:0%;}
@@ -557,6 +566,33 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         <div class="fg2"><label>Endereço</label><input type="text" id="new-endereco" placeholder="Rua, número, bairro, cidade/UF"/></div>
         <div class="fg2"><label>CEP</label><input type="text" id="new-cep" placeholder="00000-000"/></div>
       </div>
+      <div class="fg2" style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:2px;margin-bottom:2px">
+        <label style="display:block;margin-bottom:8px;color:var(--gold2)">🧮 Sistema de Análise Específica</label>
+        <div class="frow2c">
+          <div class="fg2"><label>Crédito desejado</label><input type="text" id="new-credito-sistema" placeholder="Valor do crédito"/></div>
+          <div class="fg2"><label>Parcela</label><input type="text" id="new-parcela-sistema" placeholder="Valor da parcela"/></div>
+        </div>
+        <div class="frow2c">
+          <div class="fg2"><label>Meses</label><input type="text" id="new-meses" placeholder="Quantidade de meses"/></div>
+          <div class="fg2"><label>Grupo (opcional)</label><input type="text" id="new-grupo" placeholder="Grupo"/></div>
+        </div>
+        <div class="frow2c">
+          <div class="fg2">
+            <label>Bem</label>
+            <div style="display:flex;gap:14px;padding-top:4px">
+              <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer"><input type="radio" name="bem" id="bem-imovel" value="imovel" checked/> Imóvel</label>
+              <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer"><input type="radio" name="bem" id="bem-auto" value="auto"/> Auto</label>
+            </div>
+          </div>
+          <div class="fg2">
+            <label>Administradora</label>
+            <div style="display:flex;gap:14px;padding-top:4px">
+              <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer"><input type="radio" name="administradora" id="adm-roma" value="roma" checked/> Roma</label>
+              <label style="display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer"><input type="radio" name="administradora" id="adm-santander" value="santander"/> Santander</label>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="fg2"><label>Título *</label><input type="text" id="new-title" placeholder="Identificação breve da solicitação..."/></div>
       <div class="fg2">
         <label>Nível de urgência *</label>
@@ -632,6 +668,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
           <div><div class="di-label">Profissão</div><div class="di-val" id="vd-profissao">–</div></div>
           <div><div class="di-label">Endereço</div><div class="di-val" id="vd-endereco">–</div></div>
           <div><div class="di-label">CEP</div><div class="di-val" id="vd-cep">–</div></div>
+          <div><div class="di-label">Crédito (sistema)</div><div class="di-val" id="vd-credito-sistema">–</div></div>
+          <div><div class="di-label">Parcela (sistema)</div><div class="di-val" id="vd-parcela-sistema">–</div></div>
+          <div><div class="di-label">Meses</div><div class="di-val" id="vd-meses">–</div></div>
+          <div><div class="di-label">Grupo</div><div class="di-val" id="vd-grupo">–</div></div>
+          <div><div class="di-label">Bem</div><div class="di-val" id="vd-bem">–</div></div>
+          <div><div class="di-label">Administradora</div><div class="di-val" id="vd-administradora">–</div></div>
           <div><div class="di-label">Urgência</div><div id="vd-urg">–</div></div>
           <div><div class="di-label">Status</div><div id="vd-stat">–</div></div>
           <div><div class="di-label">Solicitante</div><div class="di-val" id="vd-user">–</div></div>
@@ -684,7 +726,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="mtab-content" id="tab-attachments">
         <div class="attach-zone" id="attach-drop-zone">
           <div class="attach-ico">📎</div>
-          <div class="attach-hint">Clique ou arraste arquivos aqui<br><b>PDF, imagens, Word, Excel</b> e outros<br><span style="font-size:0.7rem;opacity:0.7">Arquivos são removidos automaticamente após 24h</span></div>
+          <div class="attach-hint">Clique ou arraste arquivos aqui<br><b>PDF, imagens, Word, Excel</b> e outros</div>
         </div>
         <input type="file" id="attach-file-input" style="display:none" multiple/>
         <div class="upload-progress" id="upload-progress">
@@ -693,6 +735,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
             <span id="upload-pct">0%</span>
           </div>
           <div class="upload-progress-bar"><div class="upload-progress-fill" id="upload-fill"></div></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:0.5rem">
+          <div class="attach-view-toggle" id="attach-view-toggle">
+            <button class="on" onclick="setAttachViewMode('list')">☰ Lista</button>
+            <button onclick="setAttachViewMode('feed')">🖼️ Visualizar</button>
+          </div>
         </div>
         <div class="attach-list" id="attach-list">
           <div style="text-align:center;padding:1.2rem;color:var(--muted);font-size:0.82rem">Nenhum anexo ainda</div>
@@ -759,7 +807,7 @@ const STATUS_LABEL={pendente:"Pendente",aprovada:"Análise Aprovada",reprovada:"
 // igual ao comportamento original do app).
 const canSeeTicket=t=>!t.is_private||t.user_id===cu?.id||isAdmin(cp?.role);
 
-let cu=null,cp=null,tickets=[],cFilter="todos",cView="dashboard",vTicketId=null;
+let cu=null,cp=null,tickets=[],cFilter="todos",cView="dashboard",vTicketId=null,_attachViewMode="list";
 const uOrd={critico:0,alto:1,medio:2,baixo:3};
 const uClr={critico:"#f87171",alto:"#fb923c",medio:"#fbbf24",baixo:"#4ade80"};
 
@@ -1002,6 +1050,12 @@ window.submitTicket=async()=>{
   const cpf=document.getElementById("new-cpf").value.trim();
   const credito=document.getElementById("new-credito").value.trim();
   const parcela=document.getElementById("new-parcela").value.trim();
+  const creditoSistema=document.getElementById("new-credito-sistema").value.trim();
+  const parcelaSistema=document.getElementById("new-parcela-sistema").value.trim();
+  const meses=document.getElementById("new-meses").value.trim();
+  const grupo=document.getElementById("new-grupo").value.trim();
+  const bem=document.querySelector("input[name='bem']:checked")?.value||"";
+  const administradora=document.querySelector("input[name='administradora']:checked")?.value||"";
   const renda=document.getElementById("new-renda").value.trim();
   const profissao=document.getElementById("new-profissao").value.trim();
   const endereco=document.getElementById("new-endereco").value.trim();
@@ -1015,14 +1069,17 @@ window.submitTicket=async()=>{
   try{
     const {error}=await sb.from("analises").insert({
       ticket_id:gid(),nome,idade:idadeRaw?parseInt(idadeRaw,10):null,telefone,cpf,credito,parcela,renda,profissao,endereco,cep,
+      credito_sistema:creditoSistema,parcela_sistema:parcelaSistema,meses,grupo,bem,administradora,
       title,urgency,description:desc,extra,is_private:isPrivate,
       status:"pendente",user_id:cu.id,user_name:cp?.name||cu.email,user_dept:ROLE_LABEL[cp?.role]||cp?.role||"–",
       attachments:[]
     });
     if(error)throw error;
     closeModal("modal-new");showToast(isPrivate?"Análise particular solicitada — só você e o admin veem.":"Análise solicitada com sucesso!");
-    ["new-nome","new-idade","new-telefone","new-cpf","new-credito","new-parcela","new-renda","new-profissao","new-endereco","new-cep","new-title","new-desc","new-extra"].forEach(i=>document.getElementById(i).value="");
+    ["new-nome","new-idade","new-telefone","new-cpf","new-credito","new-parcela","new-credito-sistema","new-parcela-sistema","new-meses","new-grupo","new-renda","new-profissao","new-endereco","new-cep","new-title","new-desc","new-extra"].forEach(i=>document.getElementById(i).value="");
     document.getElementById("u-b").checked=true;
+    document.getElementById("bem-imovel").checked=true;
+    document.getElementById("adm-roma").checked=true;
     document.getElementById("new-private").checked=false;
   }catch(e){console.error(e);showToast("Erro ao solicitar análise.",false);}
 };
@@ -1043,6 +1100,12 @@ window.viewTicket=id=>{
   document.getElementById("vd-parcela").textContent=t.parcela||"–";
   document.getElementById("vd-renda").textContent=t.renda||"–";
   document.getElementById("vd-profissao").textContent=t.profissao||"–";
+  document.getElementById("vd-credito-sistema").textContent=t.credito_sistema||"–";
+  document.getElementById("vd-parcela-sistema").textContent=t.parcela_sistema||"–";
+  document.getElementById("vd-meses").textContent=t.meses||"–";
+  document.getElementById("vd-grupo").textContent=t.grupo||"–";
+  document.getElementById("vd-bem").textContent=t.bem==="imovel"?"Imóvel":t.bem==="auto"?"Auto":"–";
+  document.getElementById("vd-administradora").textContent=t.administradora==="roma"?"Roma":t.administradora==="santander"?"Santander":"–";
   document.getElementById("vd-endereco").textContent=t.endereco||"–";
   document.getElementById("vd-cep").textContent=t.cep||"–";
   document.getElementById("vd-urg").innerHTML=`<span class="badge badge-${t.urgency}">${cap(t.urgency)}</span>`;
@@ -1148,6 +1211,15 @@ function fmtUploadDate(uploadedAt){
   return new Date(uploadedAt).toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"});
 }
 
+window.setAttachViewMode=mode=>{
+  _attachViewMode=mode;
+  const toggle=document.getElementById("attach-view-toggle");
+  if(toggle)toggle.innerHTML=`
+    <button class="${_attachViewMode==='list'?'on':''}" onclick="setAttachViewMode('list')">☰ Lista</button>
+    <button class="${_attachViewMode==='feed'?'on':''}" onclick="setAttachViewMode('feed')">🖼️ Visualizar</button>`;
+  loadAttachments();
+};
+
 window.loadAttachments=att=>{
   const ticketId=typeof att==="string"?att:vTicketId;
   const t=tickets.find(x=>x.id===ticketId);
@@ -1157,6 +1229,28 @@ window.loadAttachments=att=>{
   badge.textContent=atts.length;
   if(!atts.length){
     list.innerHTML=`<div style="text-align:center;padding:1.2rem;color:var(--muted);font-size:0.82rem">Nenhum anexo ainda</div>`;
+    return;
+  }
+  if(_attachViewMode==="feed"){
+    list.innerHTML=atts.map((a,i)=>{
+      const ext=getExtClass(a.name);
+      const extLabel=(a.name||"").split(".").pop().toUpperCase().slice(0,4);
+      const body=ext==="img"
+        ?`<img src="${esc(a.url)}" alt="${esc(a.name)}" loading="lazy">`
+        :ext==="pdf"
+        ?`<iframe src="${esc(a.url)}" title="${esc(a.name)}"></iframe>`
+        :`<div class="attach-preview-empty">Sem pré-visualização para este tipo de arquivo. Use o botão de baixar acima.</div>`;
+      return`<div class="attach-feed-item">
+        <div class="attach-feed-head">
+          <div class="attach-ext ${ext}">${esc(extLabel)}</div>
+          <div class="attach-name" style="white-space:normal" title="${esc(a.name)}">${esc(a.name)}</div>
+          <div class="attach-size">${fmtSize(a.size)}</div>
+          <a class="attach-dl" href="${esc(a.url)}" target="_blank" rel="noopener">⬇ Baixar</a>
+          <button class="attach-del" onclick="removeAttachment(${i})" title="Remover">✕</button>
+        </div>
+        <div class="attach-preview-body">${body}</div>
+      </div>`;
+    }).join("");
     return;
   }
   list.innerHTML=atts.map((a,i)=>{
