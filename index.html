@@ -794,11 +794,12 @@ const ROLE_LABEL={admin:"Admin",ceo:"CEO",coordenador:"Coordenador",supervisor:"
 const isAdmin=role=>role==="admin"||role==="ceo";
 const STATUS_LABEL={pendente:"Pendente",aprovada:"Análise Aprovada",reprovada:"Análise Reprovada"};
 
-// Análise "particular": visível só pra quem abriu e pro admin. Isso é
-// reforçado também no banco (RLS exige apenas usuário autenticado — a
-// regra de "só admin/dono vê particular" é aplicada aqui no cliente,
-// igual ao comportamento original do app).
-const canSeeTicket=t=>!t.is_private||t.user_id===cu?.id||isAdmin(cp?.role);
+// Antes existia um modo "particular" que escondia a análise de todo mundo
+// menos quem abriu e o admin. O formulário de criação não oferece mais essa
+// opção, e agora todo mundo enxerga qualquer análise aberta — não filtra
+// mais por is_private (o campo continua existindo em análises antigas, mas
+// deixou de ter efeito).
+const canSeeTicket=()=>true;
 
 let cu=null,cp=null,tickets=[],cFilter="todos",cView="dashboard",vTicketId=null,_attachViewMode="list";
 const uOrd={critico:0,alto:1,medio:2,baixo:3};
@@ -1006,7 +1007,7 @@ window.renderTickets=()=>{
   document.getElementById("tick-table").style.display="table";
   document.getElementById("tick-body").innerHTML=src.map(t=>`<tr>
     <td><span class="tid">${esc(t.ticket_id||"–")}</span></td>
-    <td><div class="t-title">${t.is_private?'🔒 ':''}${esc(t.title)}</div><div class="t-meta">${esc(t.user_name||"")}</div></td>
+    <td><div class="t-title">${esc(t.title)}</div><div class="t-meta">${esc(t.user_name||"")}</div></td>
     <td style="font-size:0.78rem;color:var(--muted2)">${esc(t.nome||"–")}</td>
     <td><span class="badge badge-${t.urgency}">${cap(t.urgency)}</span></td>
     <td><span class="badge badge-${t.status||"pendente"}">${STATUS_LABEL[t.status]||cap(t.status||"pendente")}</span></td>
@@ -1074,7 +1075,6 @@ window.submitTicket=async()=>{
 // ── VIEW TICKET ────────────────────────────────────────────────────────────────
 window.viewTicket=id=>{
   const t=tickets.find(x=>x.id===id);if(!t)return;
-  if(!canSeeTicket(t)){showToast("Essa análise é particular.",false);return;}
   vTicketId=id;
   document.getElementById("vw-dot").style.background=uClr[t.urgency]||"var(--gold)";
   document.getElementById("vw-title").textContent=t.title;
