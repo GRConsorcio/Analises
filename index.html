@@ -551,6 +551,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   <div class="modal" style="max-width:540px">
     <div class="mhead"><div class="mhead-l"><span>📊</span><h3>Solicitar Análise</h3></div><button class="mclose" onclick="closeModal('modal-new')">✕</button></div>
     <div class="mbody">
+      <div class="fg2"><label>Consultor</label><input type="text" id="new-consultor" placeholder="Nome do consultor responsável"/></div>
       <div class="frow2c">
         <div class="fg2"><label>Nome *</label><input type="text" id="new-nome" placeholder="Nome completo do cliente"/></div>
         <div class="fg2"><label>Idade</label><input type="number" id="new-idade" placeholder="Idade" min="0"/></div>
@@ -653,6 +654,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         </div>
 
         <div class="dgrid">
+          <div><div class="di-label">Consultor</div><div class="di-val" id="vd-consultor">–</div></div>
           <div><div class="di-label">Nome</div><div class="di-val" id="vd-nome">–</div></div>
           <div><div class="di-label">Idade</div><div class="di-val" id="vd-idade">–</div></div>
           <div><div class="di-label">Telefone</div><div class="di-val" id="vd-telefone">–</div></div>
@@ -1038,6 +1040,7 @@ window.closeModal=id=>{
 };
 
 window.submitTicket=async()=>{
+  const consultor=document.getElementById("new-consultor").value.trim();
   const nome=document.getElementById("new-nome").value.trim();
   const idadeRaw=document.getElementById("new-idade").value;
   const telefone=document.getElementById("new-telefone").value.trim();
@@ -1057,7 +1060,7 @@ window.submitTicket=async()=>{
   if(!nome||!telefone||!cpf||!title){showToast("Preencha os campos obrigatórios.",false);return;}
   try{
     const {error}=await sb.from("analises").insert({
-      ticket_id:gid(),nome,idade:idadeRaw?parseInt(idadeRaw,10):null,telefone,cpf,renda,profissao,endereco,cep,
+      ticket_id:gid(),consultor,nome,idade:idadeRaw?parseInt(idadeRaw,10):null,telefone,cpf,renda,profissao,endereco,cep,
       credito_sistema:creditoSistema,parcela_sistema:parcelaSistema,meses,grupo,bem,administradora,
       title,urgency,is_private:false,
       status:"pendente",user_id:cu.id,user_name:cp?.name||cu.email,user_dept:ROLE_LABEL[cp?.role]||cp?.role||"–",
@@ -1065,7 +1068,7 @@ window.submitTicket=async()=>{
     });
     if(error)throw error;
     closeModal("modal-new");showToast("Análise solicitada com sucesso!");
-    ["new-nome","new-idade","new-telefone","new-cpf","new-credito-sistema","new-parcela-sistema","new-meses","new-grupo","new-renda","new-profissao","new-endereco","new-cep","new-title"].forEach(i=>document.getElementById(i).value="");
+    ["new-consultor","new-nome","new-idade","new-telefone","new-cpf","new-credito-sistema","new-parcela-sistema","new-meses","new-grupo","new-renda","new-profissao","new-endereco","new-cep","new-title"].forEach(i=>document.getElementById(i).value="");
     document.getElementById("u-b").checked=true;
     document.getElementById("bem-imovel").checked=true;
     document.getElementById("adm-roma").checked=true;
@@ -1079,6 +1082,7 @@ window.viewTicket=id=>{
   document.getElementById("vw-dot").style.background=uClr[t.urgency]||"var(--gold)";
   document.getElementById("vw-title").textContent=t.title;
   document.getElementById("vw-id").textContent=t.ticket_id||id;
+  document.getElementById("vd-consultor").textContent=t.consultor||"–";
   document.getElementById("vd-nome").textContent=t.nome||"–";
   document.getElementById("vd-idade").textContent=(t.idade??"–");
   document.getElementById("vd-telefone").textContent=t.telefone||"–";
