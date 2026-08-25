@@ -451,6 +451,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke-width="1.5" stroke-linecap="round"/></svg>
         Meu Perfil
       </button>
+      <div class="nav-sec" id="nav-sec-admin" style="display:none">Admin</div>
+      <button class="nav-item" id="nav-admin-btn" style="display:none" onclick="setView('admin',this)">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke-width="1.5"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-width="1.5"/></svg>
+        Usuários
+      </button>
       <div class="sb-user">
         <div class="ucard">
           <div class="ucard-top">
@@ -543,6 +548,17 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
             </div>
           </div>
           <button class="btn-gold" onclick="openEditProfile()" style="max-width:220px;margin:0 auto;display:block;padding:0.6rem 1.5rem;font-size:0.85rem;">✏️ Editar Perfil</button>
+        </div>
+
+        <div id="view-admin" style="display:none">
+          <div class="tw">
+            <div style="padding:0.9rem 1rem;border-bottom:1px solid var(--border);font-size:0.68rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.05em">Usuários (crm_users)</div>
+            <div id="load-adm-usuarios" class="loading"><div class="spinner"></div>Carregando usuários...</div>
+            <table class="tt" id="adm-usuarios-table" style="display:none">
+              <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th></th></tr></thead>
+              <tbody id="adm-usuarios-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </main>
@@ -783,6 +799,26 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
   </div>
 </div>
 
+<!-- MODAL EDITAR USUÁRIO (admin) -->
+<div class="moverlay" id="modal-edit-user">
+  <div class="modal" style="max-width:460px">
+    <div class="mhead"><div class="mhead-l"><span>🛠️</span><h3>Editar usuário</h3></div><button class="mclose" onclick="closeModal('modal-edit-user')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="eu-id">
+      <div class="fg2"><label>Nome completo *</label><input type="text" id="eu-name"/></div>
+      <div class="fg2"><label>E-mail *</label><input type="email" id="eu-email"/></div>
+      <hr class="sdiv" style="margin:0.5rem 0 1rem"/>
+      <div style="font-size:0.68rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem;">Redefinir senha (opcional)</div>
+      <div class="fg2"><label>Nova senha</label><input type="password" id="eu-pass" placeholder="Deixe em branco para não alterar (mínimo 6 caracteres)"/></div>
+      <div id="eu-error" class="auth-err"></div>
+    </div>
+    <div class="mfoot">
+      <button class="btn-cancel" onclick="closeModal('modal-edit-user')">Cancelar</button>
+      <button class="btn-submit" onclick="salvarEdicaoUsuario()">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const {createClient}=supabase;
 const SUPA_URL='https://prquggwhjcvenzuziaox.supabase.co';
@@ -951,6 +987,13 @@ function showApp(){
   document.getElementById("p-email").textContent=cu.email;
   document.getElementById("p-cargo").textContent=roleLbl;
   if(cp?.created_at)document.getElementById("p-since").textContent=fmt(cp.created_at).split(" ")[0];
+  // Página de admin (editar qualquer usuário) é restrita a role==='admin' —
+  // não usa o isAdmin() geral do app (que também deixa 'ceo' entrar em outras
+  // permissões) porque editar senha/e-mail de outra pessoa é bem mais sensível;
+  // a Edge Function update-user aplica essa mesma checagem mais rígida no servidor.
+  const souAdminEstrito = role==='admin';
+  document.getElementById('nav-sec-admin').style.display = souAdminEstrito?'':'none';
+  document.getElementById('nav-admin-btn').style.display = souAdminEstrito?'':'none';
 }
 
 // ── ANÁLISES (tabela "analises" no Supabase do CRM) ────────────────────────────
@@ -1026,12 +1069,14 @@ window.setView=(v,el)=>{
   cView=v;closeSidebar();
   document.querySelectorAll(".nav-item").forEach(b=>b.classList.remove("active"));
   if(el)el.classList.add("active");
-  const t={dashboard:["Dashboard","Visão geral das análises"],todos:["Todas as Análises","Fila de prioridade geral"],meus:["Minhas Análises","Análises solicitadas por mim"],perfil:["Meu Perfil","Informações da conta"]};
+  const t={dashboard:["Dashboard","Visão geral das análises"],todos:["Todas as Análises","Fila de prioridade geral"],meus:["Minhas Análises","Análises solicitadas por mim"],perfil:["Meu Perfil","Informações da conta"],admin:["Usuários","Gerenciar contas do sistema"]};
   document.getElementById("view-title").textContent=t[v]?.[0]||v;
   document.getElementById("view-sub").textContent=t[v]?.[1]||"";
-  document.getElementById("view-tickets").style.display=v!=="perfil"?"block":"none";
+  document.getElementById("view-tickets").style.display=(v!=="perfil"&&v!=="admin")?"block":"none";
   document.getElementById("view-perfil").style.display=v==="perfil"?"block":"none";
-  if(v!=="perfil")renderTickets();
+  document.getElementById("view-admin").style.display=v==="admin"?"block":"none";
+  if(v==="admin")renderAdminUsuarios();
+  else if(v!=="perfil")renderTickets();
 };
 window.setFilter=(f,el)=>{cFilter=f;document.querySelectorAll(".fbtn").forEach(b=>b.classList.remove("active"));if(el)el.classList.add("active");renderTickets();};
 window.goToPerfil=()=>{const btns=document.querySelectorAll(".nav-item");let b=null;btns.forEach(x=>{if(x.textContent.trim().startsWith("Meu Perfil"))b=x;});setView("perfil",b);};
@@ -1419,6 +1464,63 @@ window.saveProfile=async()=>{
   }catch(e){
     err.textContent="Erro: "+(e.message||e.code||"desconhecido");
   }
+};
+
+// ── ADMIN: EDITAR QUALQUER USUÁRIO (nome/e-mail/senha) ──────────────────────
+// Trocar e-mail/senha de outra pessoa exige auth.admin.updateUserById, que só
+// funciona com a service_role key — por isso passa pela Edge Function
+// update-user (mesmo projeto Supabase do CRM), que confere admin no servidor
+// antes de fazer qualquer coisa. Editar só o nome não precisa disso, mas vai
+// pela mesma function pra manter um caminho só e a lógica simples.
+let ADM_USUARIOS_CACHE=[];
+async function renderAdminUsuarios(){
+  document.getElementById('load-adm-usuarios').style.display='flex';
+  document.getElementById('adm-usuarios-table').style.display='none';
+  const { data, error } = await sb.from('crm_users').select('*').order('name');
+  document.getElementById('load-adm-usuarios').style.display='none';
+  document.getElementById('adm-usuarios-table').style.display='table';
+  if(error){ showToast('Erro ao carregar usuários: '+error.message,false); return; }
+  ADM_USUARIOS_CACHE=data||[];
+  document.getElementById('adm-usuarios-body').innerHTML=(data||[]).map(u=>`<tr>
+    <td>${esc(u.name||'—')}</td>
+    <td style="font-size:0.78rem;color:var(--muted2)">${esc(u.email||'—')}</td>
+    <td><span class="badge" style="background:var(--surface2);color:var(--gold2)">${esc(ROLE_LABEL[u.role]||u.role||'—')}</span></td>
+    <td>${u.ativo?'<span class="badge badge-baixo">Ativo</span>':'<span class="badge" style="background:var(--surface2);color:var(--muted)">Inativo</span>'}</td>
+    <td><button class="btn-view" onclick="abrirEditarUsuario('${u.user_id}')">Editar</button></td>
+  </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Nenhum usuário.</td></tr>';
+}
+window.abrirEditarUsuario=id=>{
+  const u=ADM_USUARIOS_CACHE.find(x=>x.user_id===id);
+  if(!u)return;
+  document.getElementById('eu-id').value=u.user_id;
+  document.getElementById('eu-name').value=u.name||'';
+  document.getElementById('eu-email').value=u.email||'';
+  document.getElementById('eu-pass').value='';
+  document.getElementById('eu-error').textContent='';
+  document.getElementById('modal-edit-user').classList.add('open');
+};
+window.salvarEdicaoUsuario=async()=>{
+  const user_id=document.getElementById('eu-id').value;
+  const name=document.getElementById('eu-name').value.trim();
+  const email=document.getElementById('eu-email').value.trim().toLowerCase();
+  const password=document.getElementById('eu-pass').value;
+  const err=document.getElementById('eu-error');
+  err.textContent='';
+  if(!name||!email){err.textContent='Nome e e-mail são obrigatórios.';return;}
+  if(password&&password.length<6){err.textContent='Senha mínima de 6 caracteres.';return;}
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    const resp=await fetch(SUPA_URL+'/functions/v1/update-user',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},
+      body:JSON.stringify({user_id,name,email,password:password||undefined})
+    });
+    const out=await resp.json().catch(()=>({}));
+    if(!resp.ok||out.error){err.textContent=out.error||'Erro ao salvar.';return;}
+    closeModal('modal-edit-user');
+    showToast('Usuário atualizado!');
+    renderAdminUsuarios();
+  }catch(e){err.textContent='Erro: '+e.message;}
 };
 
 // ── SISTEMA DE RESPOSTAS (tabela "analise_respostas") ─────────────────────────
