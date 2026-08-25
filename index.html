@@ -1486,7 +1486,7 @@ async function renderAdminUsuarios(){
     <td style="font-size:0.78rem;color:var(--muted2)">${esc(u.email||'—')}</td>
     <td><span class="badge" style="background:var(--surface2);color:var(--gold2)">${esc(ROLE_LABEL[u.role]||u.role||'—')}</span></td>
     <td>${u.ativo?'<span class="badge badge-baixo">Ativo</span>':'<span class="badge" style="background:var(--surface2);color:var(--muted)">Inativo</span>'}</td>
-    <td><button class="btn-view" onclick="abrirEditarUsuario('${u.user_id}')">Editar</button></td>
+    <td style="white-space:nowrap"><button class="btn-view" onclick="abrirEditarUsuario('${u.user_id}')">Editar</button> <button class="btn-delete" onclick="apagarUsuarioAdmin('${u.user_id}','${(u.name||'').replace(/'/g,"\\'")}')">🗑 Apagar</button></td>
   </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Nenhum usuário.</td></tr>';
 }
 window.abrirEditarUsuario=id=>{
@@ -1521,6 +1521,26 @@ window.salvarEdicaoUsuario=async()=>{
     showToast('Usuário atualizado!');
     renderAdminUsuarios();
   }catch(e){err.textContent='Erro: '+e.message;}
+};
+
+// Reaproveita a delete-user já existente (usada pelo CRM) — mesmo projeto
+// Supabase, já trata reatribuição de leads/vendas, FKs de campanhas/
+// transmissões/questionários e até zera analises.user_id do usuário apagado.
+// Também já protege sozinha: não deixa apagar a própria conta nem o admin geral.
+window.apagarUsuarioAdmin=async(userId,nome)=>{
+  if(!confirm(`Apagar o usuário "${nome}" definitivamente? Essa ação não pode ser desfeita — remove o login e desvincula os registros dele.`))return;
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    const resp=await fetch(SUPA_URL+'/functions/v1/delete-user',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},
+      body:JSON.stringify({user_id:userId})
+    });
+    const out=await resp.json().catch(()=>({}));
+    if(!resp.ok||out.error){showToast(out.error||'Erro ao apagar usuário.',false);return;}
+    showToast('Usuário apagado.');
+    renderAdminUsuarios();
+  }catch(e){showToast('Erro: '+e.message,false);}
 };
 
 // ── SISTEMA DE RESPOSTAS (tabela "analise_respostas") ─────────────────────────
