@@ -552,7 +552,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 
         <div id="view-admin" style="display:none">
           <div class="tw">
-            <div style="padding:0.9rem 1rem;border-bottom:1px solid var(--border);font-size:0.68rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.05em">Usuários (crm_users)</div>
+            <div style="padding:0.9rem 1rem;border-bottom:1px solid var(--border);font-size:0.68rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.05em">Usuários (login próprio do Análises)</div>
             <div id="load-adm-usuarios" class="loading"><div class="spinner"></div>Carregando usuários...</div>
             <table class="tt" id="adm-usuarios-table" style="display:none">
               <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th></th></tr></thead>
@@ -830,8 +830,12 @@ const CLD={cloud:"dxfiypr0u",preset:"UpDemandasGR",apiKey:"469518971312161"};
 const CLD_URL=`https://api.cloudinary.com/v1_1/${CLD.cloud}/auto/upload`;
 
 // ── PERFIL / ADMIN ────────────────────────────────────────────────────────────
-// Identidade compartilhada com o CRM: login e nome/perfil vêm da tabela
-// crm_users do mesmo projeto Supabase do CRM. "Admin" aqui = role admin/ceo.
+// Login PRÓPRIO do Análises (tabela analises_usuarios + funções analises_*),
+// separado de propósito do CRM (2026-08-27) — nenhuma ação aqui (criar,
+// editar, apagar, ativar/desativar) toca em crm_users/auth.users. Contas
+// antigas foram migradas de crm_users com uma senha nova (ninguém sabe qual —
+// um admin precisa definir uma senha por "Editar" pra cada pessoa que for
+// usar o Análises de novo).
 const ROLE_LABEL={admin:"Admin",ceo:"CEO",coordenador:"Coordenador",supervisor:"Supervisor",vendedor:"Vendedor"};
 const isAdmin=role=>role==="admin"||role==="ceo";
 const STATUS_LABEL={pendente:"Pendente",feita:"Análise Feita",aprovada:"Análise Aprovada",reprovada:"Análise Reprovada"};
@@ -843,7 +847,7 @@ const STATUS_LABEL={pendente:"Pendente",feita:"Análise Feita",aprovada:"Anális
 // deixou de ter efeito).
 const canSeeTicket=()=>true;
 
-let cu=null,cp=null,tickets=[],cFilter="todos",cView="dashboard",vTicketId=null,_attachViewMode="list";
+let cu=null,cp=null,tickets=[],cFilter="todos",cView="dashboard",vTicketId=null,_attachViewMode="list",analisesChannel=null;
 const uOrd={critico:0,alto:1,medio:2,baixo:3};
 const uClr={critico:"#f87171",alto:"#fb923c",medio:"#fbbf24",baixo:"#4ade80"};
 
@@ -884,21 +888,19 @@ window.doLogin=async()=>{
   document.getElementById("login-loading").classList.add("show");
   document.getElementById("auth-error").textContent="";
   try{
-    const {error}=await sb.auth.signInWithPassword({email,password:pass});
+    const {data,error}=await sb.rpc("analises_login",{p_email:email,p_senha:pass});
     if(error)throw error;
+    const row=Array.isArray(data)?data[0]:data;
+    if(!row) throw new Error("E-mail ou senha incorretos.");
     if(remember){localStorage.setItem("gr_analises_creds",btoa(JSON.stringify({e:email,p:pass})));}
     else{localStorage.removeItem("gr_analises_creds");}
+    await handleSession(row);
   }catch(e){
     document.getElementById("login-loading").classList.remove("show");
-    const msg=(e.message||"").toLowerCase();
-    let m="Erro ao entrar.";
-    if(msg.includes("invalid login credentials"))m="E-mail ou senha incorretos.";
-    else if(msg.includes("email not confirmed"))m="E-mail ainda não confirmado.";
-    else if(msg.includes("too many"))m="Muitas tentativas. Aguarde.";
-    document.getElementById("auth-error").textContent=m;
+    document.getElementById("auth-error").textContent=e.message||"Erro ao entrar.";
   }
 };
-window.doLogout=async()=>{localStorage.removeItem("gr_analises_creds");await sb.auth.signOut();};
+window.doLogout=()=>{localStorage.removeItem("gr_analises_creds");localStorage.removeItem("gr_analises_sessao");handleSession(null);};
 
 window.switchAuthTab=(tab)=>{
   document.getElementById("tab-login").style.display=tab==="login"?"block":"none";
@@ -909,9 +911,9 @@ window.switchAuthTab=(tab)=>{
   err.textContent="";err.style.color="";
 };
 
-// Cadastro cria conta na MESMA base do CRM (crm_users) — a conta nasce
-// desativada (ativo:false); um admin precisa ativá-la em crm_users antes
-// do usuário conseguir entrar aqui (ou no CRM).
+// Cadastro cria conta PRÓPRIA do Análises (analises_usuarios) — a conta nasce
+// desativada (ativo:false); um admin precisa ativá-la na aba Usuários do
+// próprio Análises antes do usuário conseguir entrar (não depende mais do CRM).
 window.doRegister=async()=>{
   const name=document.getElementById("reg-name").value.trim();
   const email=document.getElementById("reg-email").value.trim();
@@ -924,17 +926,8 @@ window.doRegister=async()=>{
   if(pass!==pass2){err.textContent="As senhas não coincidem.";return;}
   document.getElementById("login-loading").classList.add("show");
   try{
-    const {data,error}=await sb.auth.signUp({email,password:pass});
+    const {error}=await sb.rpc("analises_registrar",{p_name:name,p_email:email,p_senha:pass});
     if(error)throw error;
-    const newUser=data.user;
-    if(newUser){
-      const {error:insErr}=await sb.from("crm_users").insert({user_id:newUser.id,name,email,role:"vendedor",ativo:false});
-      if(insErr)console.error("crm_users insert error:",insErr);
-    }
-    // Sempre desloga depois do cadastro — a conta só deve funcionar depois
-    // que um admin marcar ativo:true, e não queremos depender do timing
-    // do listener de auth pra garantir isso.
-    await sb.auth.signOut();
     document.getElementById("login-loading").classList.remove("show");
     switchAuthTab("login");
     document.getElementById("login-email").value=email;
@@ -942,26 +935,29 @@ window.doRegister=async()=>{
     err.textContent="Conta criada! Aguarde um admin liberar seu acesso antes de entrar.";
   }catch(e){
     document.getElementById("login-loading").classList.remove("show");
-    const msg=(e.message||"").toLowerCase();
-    let m="Erro ao criar conta.";
-    if(msg.includes("already registered")||msg.includes("already exists")||msg.includes("user already"))m="Esse e-mail já tem conta.";
-    else if(msg.includes("password"))m="Senha inválida (mínimo 6 caracteres).";
-    else if(msg.includes("email"))m="E-mail inválido.";
-    err.textContent=m;
+    err.textContent=e.message||"Erro ao criar conta.";
   }
 };
 
-async function handleSession(session){
+// `row` é o registro cru de analises_usuarios (id,name,email,role) vindo do
+// login RPC ou do localStorage — sempre revalidado contra o banco (via a view
+// pública, sem senha) antes de liberar a tela, pra uma conta desativada por um
+// admin não continuar "logada" só porque o navegador guardou a sessão antiga.
+async function handleSession(row){
   document.getElementById("login-loading").classList.remove("show");
-  if(session?.user){
-    cu=session.user;
-    const {data}=await sb.from("crm_users").select("*").eq("user_id",cu.id).maybeSingle();
-    cp=data||{name:cu.email,role:"–"};
-    if(cp.ativo===false){
-      await sb.auth.signOut();
-      document.getElementById("auth-error").textContent="Sua conta está desativada. Fale com o administrador.";
+  if(row?.id){
+    const {data:atual}=await sb.from("analises_usuarios_publica").select("*").eq("id",row.id).maybeSingle();
+    if(!atual||atual.ativo===false){
+      localStorage.removeItem("gr_analises_sessao");
+      cu=null;cp=null;
+      document.getElementById("auth-screen").style.display="flex";
+      document.getElementById("app-screen").style.display="none";
+      document.getElementById("auth-error").textContent=atual?"Sua conta está desativada. Fale com o administrador.":"Sessão expirada, entre novamente.";
       return;
     }
+    cu={id:atual.id,email:atual.email};
+    cp={name:atual.name,role:atual.role,created_at:atual.created_at};
+    localStorage.setItem("gr_analises_sessao",JSON.stringify({id:atual.id}));
     showApp();loadTickets();
   }else{
     cu=null;cp=null;
@@ -970,7 +966,13 @@ async function handleSession(session){
     document.getElementById("app-screen").style.display="none";
   }
 }
-sb.auth.onAuthStateChange((event,session)=>{handleSession(session);});
+(function initSession(){
+  try{
+    const saved=localStorage.getItem("gr_analises_sessao");
+    if(saved){handleSession(JSON.parse(saved));return;}
+  }catch(err){}
+  handleSession(null);
+})();
 
 function showApp(){
   document.getElementById("auth-screen").style.display="none";
@@ -990,14 +992,13 @@ function showApp(){
   // Página de admin (editar qualquer usuário) é restrita a role==='admin' —
   // não usa o isAdmin() geral do app (que também deixa 'ceo' entrar em outras
   // permissões) porque editar senha/e-mail de outra pessoa é bem mais sensível;
-  // a Edge Function update-user aplica essa mesma checagem mais rígida no servidor.
+  // as funções analises_admin_* aplicam essa mesma checagem mais rígida no servidor.
   const souAdminEstrito = role==='admin';
   document.getElementById('nav-sec-admin').style.display = souAdminEstrito?'':'none';
   document.getElementById('nav-admin-btn').style.display = souAdminEstrito?'':'none';
 }
 
 // ── ANÁLISES (tabela "analises" no Supabase do CRM) ────────────────────────────
-let analisesChannel=null;
 async function loadTickets(){
   const {data,error}=await sb.from("analises").select("*").order("created_at",{ascending:false});
   if(error){console.error(error);showToast("Erro ao carregar análises.",false);return;}
@@ -1435,8 +1436,8 @@ window.toggleSound=()=>{
 };
 
 // ── PERFIL ────────────────────────────────────────────────────────────────────
-// Nome e senha aqui são os MESMOS do login no CRM (mesma conta, mesma
-// tabela crm_users) — editar aqui reflete lá também.
+// Nome e senha aqui são só do login próprio do Análises (analises_usuarios) —
+// não têm mais nenhuma relação com a conta no CRM.
 window.openEditProfile=()=>{
   document.getElementById("ep-name").value=cp?.name||"";
   document.getElementById("ep-pass").value="";document.getElementById("ep-pass2").value="";
@@ -1453,30 +1454,28 @@ window.saveProfile=async()=>{
   if(pass&&pass.length<6){err.textContent="Senha mínima 6 caracteres.";return;}
   if(pass&&pass!==pass2){err.textContent="As senhas não coincidem.";return;}
   try{
-    const {error:upErr}=await sb.from("crm_users").update({name}).eq("user_id",cu.id);
-    if(upErr)throw upErr;
-    if(pass){
-      const {error:passErr}=await sb.auth.updateUser({password:pass});
-      if(passErr)throw passErr;
-    }
-    cp={...cp,name};showApp();
+    const {error}=await sb.rpc("analises_alterar_proprio",{p_user_id:cu.id,p_name:name,p_senha_nova:pass||null});
+    if(error)throw error;
+    cp={...cp,name};
+    localStorage.setItem("gr_analises_sessao",JSON.stringify({id:cu.id}));
+    showApp();
     closeModal("modal-edit-profile");showToast("Perfil atualizado!");
   }catch(e){
     err.textContent="Erro: "+(e.message||e.code||"desconhecido");
   }
 };
 
-// ── ADMIN: EDITAR QUALQUER USUÁRIO (nome/e-mail/senha) ──────────────────────
-// Trocar e-mail/senha de outra pessoa exige auth.admin.updateUserById, que só
-// funciona com a service_role key — por isso passa pela Edge Function
-// update-user (mesmo projeto Supabase do CRM), que confere admin no servidor
-// antes de fazer qualquer coisa. Editar só o nome não precisa disso, mas vai
-// pela mesma function pra manter um caminho só e a lógica simples.
+// ── ADMIN: EDITAR QUALQUER USUÁRIO (nome/e-mail/senha/ativo) ────────────────
+// Tudo aqui passa por funções analises_admin_* (RPC no Postgres, checam
+// role==='admin' no servidor antes de fazer qualquer coisa) que só tocam em
+// analises_usuarios — nunca em crm_users/auth.users. Separado do CRM de
+// propósito (2026-08-27): apagar/editar/desativar alguém aqui não afeta o
+// login dela no CRM de jeito nenhum.
 let ADM_USUARIOS_CACHE=[];
 async function renderAdminUsuarios(){
   document.getElementById('load-adm-usuarios').style.display='flex';
   document.getElementById('adm-usuarios-table').style.display='none';
-  const { data, error } = await sb.from('crm_users').select('*').order('name');
+  const { data, error } = await sb.from('analises_usuarios_publica').select('*').order('name');
   document.getElementById('load-adm-usuarios').style.display='none';
   document.getElementById('adm-usuarios-table').style.display='table';
   if(error){ showToast('Erro ao carregar usuários: '+error.message,false); return; }
@@ -1486,13 +1485,13 @@ async function renderAdminUsuarios(){
     <td style="font-size:0.78rem;color:var(--muted2)">${esc(u.email||'—')}</td>
     <td><span class="badge" style="background:var(--surface2);color:var(--gold2)">${esc(ROLE_LABEL[u.role]||u.role||'—')}</span></td>
     <td>${u.ativo?'<span class="badge badge-baixo">Ativo</span>':'<span class="badge" style="background:var(--surface2);color:var(--muted)">Inativo</span>'}</td>
-    <td style="white-space:nowrap"><button class="btn-view" onclick="abrirEditarUsuario('${u.user_id}')">Editar</button> <button class="btn-delete" onclick="apagarUsuarioAdmin('${u.user_id}','${(u.name||'').replace(/'/g,"\\'")}')">🗑 Apagar</button></td>
+    <td style="white-space:nowrap"><button class="btn-view" onclick="abrirEditarUsuario('${u.id}')">Editar</button> <button class="btn-view" onclick="toggleAtivoUsuarioAdmin('${u.id}',${u.ativo})">${u.ativo?'Desativar':'Ativar'}</button> <button class="btn-delete" onclick="apagarUsuarioAdmin('${u.id}','${(u.name||'').replace(/'/g,"\\'")}')">🗑 Apagar</button></td>
   </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Nenhum usuário.</td></tr>';
 }
 window.abrirEditarUsuario=id=>{
-  const u=ADM_USUARIOS_CACHE.find(x=>x.user_id===id);
+  const u=ADM_USUARIOS_CACHE.find(x=>x.id===id);
   if(!u)return;
-  document.getElementById('eu-id').value=u.user_id;
+  document.getElementById('eu-id').value=u.id;
   document.getElementById('eu-name').value=u.name||'';
   document.getElementById('eu-email').value=u.email||'';
   document.getElementById('eu-pass').value='';
@@ -1500,7 +1499,7 @@ window.abrirEditarUsuario=id=>{
   document.getElementById('modal-edit-user').classList.add('open');
 };
 window.salvarEdicaoUsuario=async()=>{
-  const user_id=document.getElementById('eu-id').value;
+  const id=document.getElementById('eu-id').value;
   const name=document.getElementById('eu-name').value.trim();
   const email=document.getElementById('eu-email').value.trim().toLowerCase();
   const password=document.getElementById('eu-pass').value;
@@ -1509,35 +1508,31 @@ window.salvarEdicaoUsuario=async()=>{
   if(!name||!email){err.textContent='Nome e e-mail são obrigatórios.';return;}
   if(password&&password.length<6){err.textContent='Senha mínima de 6 caracteres.';return;}
   try{
-    const {data:{session}}=await sb.auth.getSession();
-    const resp=await fetch(SUPA_URL+'/functions/v1/update-user',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},
-      body:JSON.stringify({user_id,name,email,password:password||undefined})
-    });
-    const out=await resp.json().catch(()=>({}));
-    if(!resp.ok||out.error){err.textContent=out.error||'Erro ao salvar.';return;}
+    const {error}=await sb.rpc('analises_admin_editar',{p_caller_id:cu.id,p_alvo_id:id,p_name:name,p_email:email,p_senha_nova:password||null});
+    if(error){err.textContent=error.message;return;}
     closeModal('modal-edit-user');
     showToast('Usuário atualizado!');
     renderAdminUsuarios();
   }catch(e){err.textContent='Erro: '+e.message;}
 };
 
-// Reaproveita a delete-user já existente (usada pelo CRM) — mesmo projeto
-// Supabase, já trata reatribuição de leads/vendas, FKs de campanhas/
-// transmissões/questionários e até zera analises.user_id do usuário apagado.
-// Também já protege sozinha: não deixa apagar a própria conta nem o admin geral.
-window.apagarUsuarioAdmin=async(userId,nome)=>{
-  if(!confirm(`Apagar o usuário "${nome}" definitivamente? Essa ação não pode ser desfeita — remove o login e desvincula os registros dele.`))return;
+window.toggleAtivoUsuarioAdmin=async(id,ativoAtual)=>{
   try{
-    const {data:{session}}=await sb.auth.getSession();
-    const resp=await fetch(SUPA_URL+'/functions/v1/delete-user',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},
-      body:JSON.stringify({user_id:userId})
-    });
-    const out=await resp.json().catch(()=>({}));
-    if(!resp.ok||out.error){showToast(out.error||'Erro ao apagar usuário.',false);return;}
+    const {error}=await sb.rpc('analises_admin_toggle_ativo',{p_caller_id:cu.id,p_alvo_id:id,p_ativo:!ativoAtual});
+    if(error){showToast(error.message,false);return;}
+    showToast(ativoAtual?'Usuário desativado.':'Usuário ativado.');
+    renderAdminUsuarios();
+  }catch(e){showToast('Erro: '+e.message,false);}
+};
+
+// Apaga SÓ do analises_usuarios (RPC analises_admin_apagar) — não chama mais
+// a delete-user do CRM, que baniria o login da pessoa lá também. Refere a
+// analises.user_id fica null automaticamente (FK com ON DELETE SET NULL).
+window.apagarUsuarioAdmin=async(id,nome)=>{
+  if(!confirm(`Apagar o usuário "${nome}" definitivamente do Análises? Essa ação não pode ser desfeita — mas não mexe no login dele no CRM.`))return;
+  try{
+    const {error}=await sb.rpc('analises_admin_apagar',{p_caller_id:cu.id,p_alvo_id:id});
+    if(error){showToast(error.message,false);return;}
     showToast('Usuário apagado.');
     renderAdminUsuarios();
   }catch(e){showToast('Erro: '+e.message,false);}
